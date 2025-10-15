@@ -14,4 +14,97 @@ editor: visual
 
 ## Task 2: Writing R Functions
 
+1.  Write a basic function (call it getRMSE()) that takes in a vector of responses and a vector of predictions and outputs the RMSE. If a value is missing for the vector of responses (i.e. an NA is present), allow for additional arguments to the mean() function (elipses) that removes the NA values in the computation.
+
+```{r}
+# RMSE function: sqrt of mean of responses - predictions squared.
+# Allows for additional arguments to the mean function like na.rm.
+getRMSE <- function(responses, predictions, ...) {
+  sqrt(mean(((responses - predictions)^2), ...))
+}
+```
+
+2.  Run the following code to create some response values and predictions.
+
+```{r}
+# Code to generate random responses and predictions.
+set.seed(10)
+n <- 100
+x <- runif(n)
+resp <- 3 + 10 * x + rnorm(n)
+pred <- predict(lm(resp ~ x), data.frame(x))
+```
+
+```{r}
+# Test RMSE function on data.
+getRMSE(resp, pred)
+```
+
+Repeat after manually replacing two of the response values with missing values (NA_real\_). Test your RMSE function with and without specifying the behavior to deal with missing values.
+
+```{r}
+# Set two response values to missing.
+resp[13] <- NA_real_
+resp[50] <- NA_real_
+
+# Test the RMSE function without specifying the behavior to deal with missing.
+getRMSE(resp, pred)
+```
+
+```{r}
+# Test RMSE function while specifying behavior to deal with missing.
+getRMSE(resp, pred, na.rm = TRUE)
+```
+
+3.  Write a function called getMAE() that follows the specifications of the getRMSE() function.
+
+```{r}
+# MAE function: mean of absolute error (responses - predictions).
+# Allows for additional arguments to the mean function like na.rm.
+getMAE <- function(responses, predictions, ...) {
+  mean(abs(responses - predictions), ...)
+}
+```
+
+4.  Run the following code to create some response values and predictions.
+
+```{r}
+# Randomly generating responses and predictions.
+set.seed(10)
+n <- 100
+x <- runif(n)
+resp <- 3 + 10 * x + rnorm(n)
+pred <- predict(lm(resp ~ x), data.frame(x))
+```
+
+```{r}
+# Test the MAE function using the data.
+getMAE(resp, pred)
+```
+
+Repeat after replacing two of the response values with missing values (NA_real\_). Test your MAE function with and without specifying behavior to deal with missing values.
+
+```{r}
+# Setting two values to NA.
+resp[23] <- NA_real_
+resp[60] <- NA_real_
+
+# Testing function without dealing with missing values.
+getMAE(resp, pred)
+```
+
+```{r}
+# Testing function while dealing with missing values.
+getMAE(resp, pred, na.rm = TRUE)
+```
+
+5.  Let's create a wrapper function that can be used to get either or both metrics returned with a single function call. Do not rewrite your above two functions, call them inside the wrapper function (we would call the get RMSE() and getMAE() functions helper functions). When returning your values, give them appropriate names.
+    -   Should also check that two numeric (atomic) vectors have been passed (consider is.vector(), is.atomic(), and is.numeric()). If not, the function should stop and print an informative message.
+
+    -   Return both metrics by default and include names. The behavior should be able to be changed using a character string of metrics to find.
+
+```{r}
+
+```
+
 ## Task 3: Practice with purrr
