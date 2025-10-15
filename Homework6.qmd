@@ -174,7 +174,7 @@ getMetrics(resp, pred, metrics = ("MAE"))
 getMetrics(resp, pred)
 ```
 
-Repeat with replacing two of the response values with missing values (NA_real\_)
+Repeat with replacing two of the response values with missing values (NA_real\_).
 
 ```{r}
 # Setting values to NA.
@@ -203,6 +203,7 @@ getMetrics(resp, pred, metrics = c("RMSE", "MAE"), na.rm = TRUE)
 Test function by passing it incorrect data.
 
 ```{r}
+#| error: TRUE
 # Make data into a dataframe
 data <- data.frame(resp, pred)
 
@@ -211,6 +212,7 @@ getMetrics(data[1], data[2], metrics = c("RMSE", "MAE", na.rm = TRUE))
 ```
 
 ```{r}
+#| error: TRUE
 # Make vectors character
 resp <- as.character(resp)
 pred <- as.character(pred)
@@ -222,13 +224,14 @@ getMetrics(resp, pred, na.rm = TRUE)
 ## Task 3: Practice with purrr
 
 ```{r}
-# Create a list object to work with
+# Create a list object to work with.
 lm_fit1 <- lm(Sepal.Length ~ Sepal.Width + Species, data = iris)
 ```
 
 1.  Pull out the coefficients list element using \$, coef(), and the pluck() function from purrr.
 
 ```{r}
+# Three ways to get the coefficients list element.
 lm_fit1$coefficients
 
 coef(lm_fit1)
@@ -240,6 +243,7 @@ lm_fit1 |>
 2.  Let's fit a number of different models with the code below!
 
 ```{r}
+# Model Fits.
 lm_fit2 <- lm(Sepal.Length ~ Sepal.Width, data = iris)
 lm_fit3 <- lm(Sepal.Length ~ Petal.Width + Sepal.Width + Species, data = iris)
 lm_fit4 <- lm(Sepal.Length ~ Petal.Width + Petal.Length + Sepal.Width + Species,
@@ -250,6 +254,7 @@ fits <- list(lm_fit1, lm_fit2, lm_fit3, lm_fit4)
 Now use purrr::map() function to pull out the coefficients of each model fit from the fits object.
 
 ```{r}
+# Using map and pluck to get coefficients from all fits.
 fits |>
   map(pluck(coefficients))
 ```
@@ -257,12 +262,14 @@ fits |>
 3.  There is a function called confint() that creates confidence intervals for the coefficients in an lm() fit. We apply that function directly to the fitted object like this:
 
 ```{r}
+# Get confidence intervals for one fit.
 confint(lm_fit1)
 ```
 
 Use map() to apply the confint() function to each model fit in the fits object.
 
 ```{r}
+# Get confidence intervals for all fits.
 fits |> 
   map(confint)
 ```
@@ -270,13 +277,14 @@ fits |>
 4.  Next, let's create histograms of the residuals in each model fit! Run the code here to set up a 2x2 plotting window.
 
 ```{r}
-# Create 2x2 plotting window
+# Create 2x2 plotting window.
 par(mfrow = c(2, 2))
 ```
 
 Now, pull out the residual vectors (the resid elements of your fits) using map(). Then use the walk() function with hist to create plots.
 
 ```{r}
+# Get the resid elements, then use them to create histograms for each fit.
 fits |>
   map(pluck(resid)) |>
   walk(hist)
@@ -285,6 +293,7 @@ fits |>
 5.  The names aren't good, let's try to fix that! On the list that is created from the map() function used on the resid element, use the purrr::set_names() function to give the names "fit1", "fit2", "fit3", and "fit4" to the elements.
 
 ```{r}
+# Make residual histograms for each fit, setting the names for each.
 fits |>
   map(pluck(resid)) |>
   set_names(c("fit1", "fit2", "fit3", "fit4")) |>
