@@ -66,7 +66,7 @@ getMAE <- function(responses, predictions, ...) {
 }
 ```
 
-4.  Run the following code to create some response values and predictions.
+4.  Run the following code to create some response values and predictions
 
 ```{r}
 # Randomly generating responses and predictions.
@@ -98,13 +98,106 @@ getMAE(resp, pred)
 getMAE(resp, pred, na.rm = TRUE)
 ```
 
-5.  Let's create a wrapper function that can be used to get either or both metrics returned with a single function call. Do not rewrite your above two functions, call them inside the wrapper function (we would call the get RMSE() and getMAE() functions helper functions). When returning your values, give them appropriate names.
+5.  Let's create a wrapper function that can be used to get either or both metrics returned with a single function call. Do not rewrite your above two functions, call them inside the wrapper function (we would call the getRMSE() and getMAE() functions helper functions). When returning your values, give them appropriate names.
     -   Should also check that two numeric (atomic) vectors have been passed (consider is.vector(), is.atomic(), and is.numeric()). If not, the function should stop and print an informative message.
 
     -   Return both metrics by default and include names. The behavior should be able to be changed using a character string of metrics to find.
 
 ```{r}
+# Wrapper function for getting metrics from responses and predictions
+getMetrics <- function(responses, predictions, 
+                       metrics = c("RMSE", "MAE"), ...) {
+  # Check conditions
+  if (is.vector(responses) && is.vector(predictions)) {
+    if (is.atomic(responses) && is.atomic(predictions)) {
+      if (is.numeric(responses) && is.numeric(predictions)) {
+        metrics_list <- list()
+        # If conditions are met check for RMSE metric and get it
+        if ("RMSE" %in% metrics) {
+          metrics_list["RMSE"] <- getRMSE(responses, predictions, ...)
+        }
+        # If conditions are met check for MAE metric and get it
+        if ("MAE" %in% metrics) {
+          metrics_list["MAE"] <- getMAE(responses, predictions, ...)
+        }
+        return(metrics_list)
+      }
+    }
+  }
+  # If any of the conditions are not met then stop the function with message
+  stop("Arguments must be numeric atomic vectors")
+}
+```
 
+6.  Run the following code to create some response values and predictions
+
+```{r}
+set.seed(10)
+n <- 100
+x <- runif(n)
+resp <- 3 + 10 * x + rnorm(n)
+pred <- predict(lm(resp ~ x), data.frame(x))
+```
+
+```{r}
+# Test the function using this data.
+# Call for the RMSE metric.
+getMetrics(resp, pred, metrics = ("RMSE"))
+```
+
+```{r}
+# Call for the MAE metric.
+getMetrics(resp, pred, metrics = ("MAE"))
+```
+
+```{r}
+# Call for both metrics.
+getMetrics(resp, pred)
+```
+
+Repeat with replacing two of the response values with missing values (NA_real\_)
+
+```{r}
+# Setting values to NA.
+resp[33] <- NA_real_
+resp[70] <- NA_real_
+
+# Try without handling missing values.
+getMetrics(resp, pred)
+```
+
+```{r}
+# Call for RMSE metric with missing values.
+getMetrics(resp, pred, metrics = c("RMSE"), na.rm = TRUE)
+```
+
+```{r}
+# Call for MAE metric with missing values.
+getMetrics(resp, pred, metrics = c("MAE"), na.rm = TRUE)
+```
+
+```{r}
+# Call for both metrics with missing values.
+getMetrics(resp, pred, metrics = c("RMSE", "MAE"), na.rm = TRUE)
+```
+
+Test function by passing it incorrect data.
+
+```{r}
+# Make data into a dataframe
+data <- data.frame(resp, pred)
+
+# Call function with incorrect data
+getMetrics(data[1], data[2], metrics = c("RMSE", "MAE", na.rm = TRUE))
+```
+
+```{r}
+# Make vectors character
+resp <- as.character(resp)
+pred <- as.character(pred)
+
+# Call function with incorrect data
+getMetrics(resp, pred, na.rm = TRUE)
 ```
 
 ## Task 3: Practice with purrr
